@@ -58,11 +58,9 @@ It solves the chaos of **ticket shortages, fraud risks, and high cancellation fe
 ## 🔍 How It Works
 
 ### Tickets Reselling
-
 1. **Seller Uploads Ticket:** Upload a PDF, OCR extracts details (PNR, seat, timings).  
 2. **AI-Powered Security Check:** Validate PNR & blur sensitive details.  
 3. **Buyer Bids:** If the seller has the premium version of platform, the seller can setup an auction for the tickets. User with highest bid gets the tickets, and ticket is locked in escrow.  
-
 4. **Buyer Buys:** If the seller doesn't have the premium version of platform, the buyer can buy the tickets directly.
 5. **Ticket Access:** Buyer gets the **full ticket** only after payment.  
 6. **Escrow Release:** Payment is released to the seller once travel is completed.  
