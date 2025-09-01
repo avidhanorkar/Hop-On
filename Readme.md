@@ -104,6 +104,6 @@ It solves the chaos of **ticket shortages, fraud risks, and high cancellation fe
 | Name | Role |
 |------------------------|-----------------------------------------------------| 
 | **Avishkar Dhanorkar** | Project Manager, Frontend Developer | 
-| **Need Some** | Frontend Developer |
+| **Need Some Guys** | Frontend Developer & ML Developer |
 
 ---
