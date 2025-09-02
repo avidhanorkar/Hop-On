@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { AuthRequest } from "../middleware/authMiddleware.js";
 import { generateOtp } from "../utils/generateOtp.js";
 import { sendMails } from "../utils/sendMail.js";
+import crypto from "crypto";
 
 const registerUser = async (req: Request, res: Response) => {
 
@@ -101,12 +102,12 @@ const loginUser = async (req: Request, res: Response) => {
     });
 }
 
-const verifyEmail = async (req: AuthRequest, res: Response) => {
+const verifyEmail = async (req: Request, res: Response) => {
 
     try {
         const { userId, otp } = req.body;
         if (!userId || !otp) {
-            return res.status(401).json({ msg: "Not Authorized" })
+            return res.status(400).json({ msg: "All Fields are required" })
         };
 
 
@@ -136,8 +137,8 @@ const verifyEmail = async (req: AuthRequest, res: Response) => {
             })
         }
 
-        delete user.otp;
-        delete user.otpExpiry;
+        user.otp = null;
+        user.otpExpiry = null;
         user.emailVerification = true;
         await user.save();
 
@@ -151,10 +152,100 @@ const verifyEmail = async (req: AuthRequest, res: Response) => {
     }
 }
 
+const requestForChangePass = async (req: AuthRequest, res: Response) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({
+                msg: "All Fields are required"
+            })
+        };
+
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({
+                msg: "Not Found"
+            })
+        };
+
+        const resetToken = crypto.randomBytes(32).toString("hex");
+        const hashedToken = await bcrypt.hash(resetToken, 10);
+
+        user.resetPassToken = hashedToken;
+        user.resetPassExpiry = new Date(Date.now() + 15 * 60 * 1000);
+        await user.save();
+        const url = `{{base}}/auth/passReset?token=${resetToken}&id=${user._id}`;
+        // TODO 1: On Completion Change the link for better 
+        await sendMails(user.email, "Hop On Password Reset", "Visit URL: " + url);
+
+        return res.status(200).json({
+            msg: "Password Reset Mail Sent Successfully"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            msg: "Internal Server Error"
+        })
+    }
+}
+
+const resetPassword = async (req: AuthRequest, res: Response) => {
+    const { newPass, cnfmNewPass } = req.body;
+    const { token, id } = req.params;
+
+    try {
+        if (!token || !id || !newPass || !cnfmNewPass) {
+            return res.status(400).json({ msg: "All Fields are required" })
+        };
+
+        if (newPass !== cnfmNewPass) {
+            return res.status(400).json({
+                msg: "Password and Confirm Password do not match"
+            })
+        };
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({
+                msg: "Not Found"
+            })
+        };
+
+        if (!user.resetPassToken || !user.resetPassExpiry)
+            return res.status(400).json({ msg: "Invalid or expired token" });
+
+        if (user.resetPassExpiry < new Date()) {
+            return res.status(400).json({ msg: "Token has expired" });
+        }
+
+        const isTokenValid = await bcrypt.compare(token, user.resetPassToken)
+        if (!isTokenValid) {
+            return res.status(400).json({ msg: "Invalid token" })
+        }
+
+
+
+        const newHashedPass = await bcrypt.hash(newPass, 10);
+        user.password = newHashedPass;
+        user.resetPassToken = null;
+        user.resetPassExpiry = null;
+        await user.save();
+
+        return res.status(200).json({
+            msg: "Password Reset Succesfully"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            msg: "Internal Server Error"
+        })
+    }
+}
+
 
 
 export default {
     registerUser,
     loginUser,
-    verifyEmail
+    verifyEmail,
+    requestForChangePass,
+    resetPassword
 };

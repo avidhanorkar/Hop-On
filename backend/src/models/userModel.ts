@@ -37,6 +37,8 @@ const userSchema = new mongoose.Schema({
         avgRating:Number,
         totalRating: Number
     },
+    
+    // Verification Purposes
     otp: {
         type: String
     },
@@ -46,6 +48,14 @@ const userSchema = new mongoose.Schema({
     emailVerification: {
         type: Boolean,
         default: false
+    },
+
+    // Password Reset
+    resetPassToken: {
+        type: String
+    },
+    resetPassExpiry: {
+        type: Date
     }
 });
 
