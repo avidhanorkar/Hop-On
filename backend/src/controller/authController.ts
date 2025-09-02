@@ -169,12 +169,12 @@ const requestForChangePass = async (req: AuthRequest, res: Response) => {
         };
 
         const resetToken = crypto.randomBytes(32).toString("hex");
-        const hashedToken = await bcrypt.hash(resetToken, 10);
+        const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
 
         user.resetPassToken = hashedToken;
         user.resetPassExpiry = new Date(Date.now() + 15 * 60 * 1000);
         await user.save();
-        const url = `{{base}}/auth/passReset?token=${resetToken}&id=${user._id}`;
+        const url = `{{base}}/auth/passReset?token=${resetToken}`;
         // TODO 1: On Completion Change the link for better 
         await sendMails(user.email, "Hop On Password Reset", "Visit URL: " + url);
 
@@ -190,10 +190,10 @@ const requestForChangePass = async (req: AuthRequest, res: Response) => {
 
 const resetPassword = async (req: AuthRequest, res: Response) => {
     const { newPass, cnfmNewPass } = req.body;
-    const { token, id } = req.params;
+    const { token } = req.params;
 
     try {
-        if (!token || !id || !newPass || !cnfmNewPass) {
+        if (!token || !newPass || !cnfmNewPass) {
             return res.status(400).json({ msg: "All Fields are required" })
         };
 
@@ -203,26 +203,18 @@ const resetPassword = async (req: AuthRequest, res: Response) => {
             })
         };
 
-        const user = await User.findById(id);
+        const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+        const user = await User.findOne({
+            resetPassToken: hashedToken,
+            resetPassExpiry: {
+                $gt: Date.now()
+            }
+        });
         if (!user) {
             return res.status(404).json({
                 msg: "Not Found"
             })
         };
-
-        if (!user.resetPassToken || !user.resetPassExpiry)
-            return res.status(400).json({ msg: "Invalid or expired token" });
-
-        if (user.resetPassExpiry < new Date()) {
-            return res.status(400).json({ msg: "Token has expired" });
-        }
-
-        const isTokenValid = await bcrypt.compare(token, user.resetPassToken)
-        if (!isTokenValid) {
-            return res.status(400).json({ msg: "Invalid token" })
-        }
-
-
 
         const newHashedPass = await bcrypt.hash(newPass, 10);
         user.password = newHashedPass;
