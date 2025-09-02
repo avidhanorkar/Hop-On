@@ -36,6 +36,16 @@ const userSchema = new mongoose.Schema({
     rating: {
         avgRating:Number,
         totalRating: Number
+    },
+    otp: {
+        type: String
+    },
+    otpExpiry: {
+        type: Date,
+    },
+    emailVerification: {
+        type: Boolean,
+        default: false
     }
 });
 
