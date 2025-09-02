@@ -88,9 +88,7 @@ const loginUser = async (req: Request, res: Response) => {
     });
 }
 
-const logOutUser = async (req: Request, res: Response) => {
-    
-} 
+
 
 export default {
     registerUser,
