@@ -20,7 +20,8 @@ const userSchema = new mongoose.Schema({
     },
     profilePic: {
         type: String,
-        required: true
+        required: true,
+        default: "https://res.cloudinary.com/drn8ou2tw/image/upload/v1756837753/754016ca-22bc-4bcf-a228-c6a69347216f.png"
     },
     role: {
         type: String,
