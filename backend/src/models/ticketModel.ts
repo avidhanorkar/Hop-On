@@ -65,11 +65,9 @@ const ticketSchema = new mongoose.Schema({
     auction: {
         startTime: {
             type: String,
-            required: true
         },
         endTime: {
             type: String,
-            required: true
         },
         highestBid: {
             userId: {
@@ -85,7 +83,7 @@ const ticketSchema = new mongoose.Schema({
             },
             amount: Number
         }],
-        ticket: {
+        ticketPdf: {
             type: String
         }
     }

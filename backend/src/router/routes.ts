@@ -2,6 +2,7 @@ import { Router } from "express";
 import authController  from "../controller/authController.js";
 import userController  from "../controller/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import ticketController from "../controller/ticketController.js";
 
 const router = Router();
 
@@ -15,6 +16,6 @@ router.get("/user/getProfile", authMiddleware.isLoggedIn, userController.getUser
 router.patch("/user/updateProfile", authMiddleware.isLoggedIn, userController.updateUserDetails);
 router.delete("/user/delete", authMiddleware.isLoggedIn, userController.deleteAccount);
 
-
+router.post("/ticket/create", authMiddleware.isLoggedIn, ticketController.createTicket);
 
 export default router;
