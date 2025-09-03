@@ -33,6 +33,13 @@ const userSchema = new mongoose.Schema({
         enum: ['male', 'female'],
         default: "male"
     },
+    hasPremium: {
+        type: Boolean,
+        default: false,
+    },
+    premiumExpiry: {
+        type: Date
+    },
     rating: {
         avgRating:Number,
         totalRating: Number

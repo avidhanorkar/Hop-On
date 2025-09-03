@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 export interface AuthRequest extends Request {
     userId?: string,
+    prem?: boolean
 }
 
 const isLoggedIn = async (req: AuthRequest, res: Response, next: NextFunction) => {
