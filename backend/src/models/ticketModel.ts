@@ -63,29 +63,32 @@ const ticketSchema = new mongoose.Schema({
         required: true
     },
     auction: {
-        startTime: {
-            type: String,
-        },
-        endTime: {
-            type: String,
-        },
-        highestBid: {
-            userId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User"
+        type: {
+            startTime: {
+                type: Date,
             },
-            amount: Number
-        },
-        bids: [{
-            userId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User"
+            endTime: {
+                type: Date,
             },
-            amount: Number
-        }],
-        ticketPdf: {
-            type: String
-        }
+            highestBid: {
+                userId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User"
+                },
+                amount: Number
+            },
+            bids: [{
+                userId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User"
+                },
+                amount: Number
+            }],
+        }, 
+        default: {}
+    },
+    ticketPdf: {
+        type: String
     }
 })
 
